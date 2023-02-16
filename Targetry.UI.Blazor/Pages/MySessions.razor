@@ -1,0 +1,77 @@
+﻿@page "/MySessions"
+@inject IUserService userService
+@attribute [Authorize]
+
+<h3>List of sessions by Userid</h3>
+
+<MudTable Elevation="25" T="UserDto" @ref="listing" ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(UpdateTable))" @bind-customer="userModel" Loading="@_tableloading">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Users</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>User Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Matricule</MudTh>
+        <MudTh>Role Id</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Matricule">@context.Matricule</MudTd>
+        <MudTd DataLabel="RoleId">@context.RoleId</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private MudTable<UserDto> listing;
+    private UserDto userModel = new UserDto();
+    private List<UserDto> users = new List<UserDto>();
+    private bool _tableloading;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetAllUsers();
+        }
+    }
+
+    private async Task<List<UserDto>> GetAllUsers()
+    {
+        HideShowLoader(true);
+        users = await userService.GetAllUsers();
+        HideShowLoader(false);
+        return users;
+    }
+
+    private async Task<TableData<UserDto>> UpdateTable(TableState state)
+    {
+        users = await userService.GetAllUsers();
+        return new TableData<UserDto>() { Items = users, TotalItems = users.Count };
+    }
+
+    private void RefreshReferences()
+    {
+        InvokeAsync(() =>
+        {
+            GetAllUsers();
+            listing.ReloadServerData();
+            StateHasChanged();
+        });
+    }
+
+    private void HideShowLoader(bool show)
+    {
+        if (show)
+        {
+            _tableloading = true;
+        }
+        else
+        {
+            _tableloading = false;
+        }
+        StateHasChanged();
+    }
+}    

@@ -1,0 +1,55 @@
+﻿@page "/MasterSearch"
+@inject IUserService userService
+@attribute [Authorize]
+
+<h3>Master search</h3>
+<MudTextField T="string" Value="@searchingText" ValueChanged="(e) => Searching(e)" Immediate="true" Label="Search here..." Variant="Variant.Outlined" />
+<MudTable Elevation="25" T="UserDto" @ref="userListing" Items="users" Loading="@_usertableloading">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Users</MudText>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>User Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Matricule</MudTh>
+        <MudTh>Role Id</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Matricule">@context.Matricule</MudTd>
+        <MudTd DataLabel="RoleId">@context.RoleId</MudTd>
+    </RowTemplate>
+</MudTable>
+@code {
+
+    public string searchingText { get; set; }
+    private List<UserDto> users = new List<UserDto>();
+    private MudTable<UserDto> userListing;
+    private bool _usertableloading;
+
+    private async Task Searching(string searchVal)
+    {
+        _usertableloading = true;
+        searchingText = searchVal;
+        users = await userService.GetAllUsers();
+        users = users.Where(element =>
+        {
+            if (!string.IsNullOrEmpty(searchingText))
+            {
+                if (element.Name.Contains(searchingText, StringComparison.OrdinalIgnoreCase)
+                    || element.Id.ToString().Contains(searchingText, StringComparison.OrdinalIgnoreCase)
+                    || element.Email.Contains(searchingText, StringComparison.OrdinalIgnoreCase)
+                    || element.Matricule.Contains(searchingText, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }).ToList();
+        _usertableloading = false;
+    }
+
+}

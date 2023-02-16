@@ -1,0 +1,61 @@
+﻿@inject ISnackbar snackBar
+@inject IRefreshRequestService RefreshPage
+@inject IUserService userService
+
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Users</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="UserModel.Id" ReadOnly="true" Label="Id" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="UserModel.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="UserModel.Email" InputType="InputType.Email" Label="Email" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="UserModel.Matricule" Label="Matricule" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="UserModel.RoleId" Label="Role" Variant="Variant.Outlined" Margin="Margin.Normal"></MudTextField>
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save Customer</MudButton>
+    </MudCardContent>
+</MudCard>
+
+@code
+{
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public UserDto UserModel { get; set; }
+
+    private async Task CreateUser()
+    {
+        await userService.CreateUser(UserModel);
+        UserModel = new UserDto();
+        snackBar.Add("Customer Saved.", Severity.Success);
+        RefreshPage.CallRequestRefresh();
+        MudDialog.Close();
+        //await GetAllUsers();
+    }
+
+    private async Task UpdateUser()
+    {
+        await userService.UpdateUser(UserModel);
+        UserModel = new UserDto();
+        snackBar.Add("Customer Updated.", Severity.Success);
+        RefreshPage.CallRequestRefresh(); 
+        MudDialog.Close();
+        //await GetAllUsers();
+    }
+
+    private async void Save()
+    {
+        if (UserModel.Id == 0)
+        {
+            await CreateUser();
+        }
+        else
+        {
+            await UpdateUser();
+        }
+    }
+}

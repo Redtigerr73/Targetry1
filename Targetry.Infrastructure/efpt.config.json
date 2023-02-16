@@ -1,0 +1,97 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "TargetryContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": "Data",
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Targetry.Infrastructure",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[dbo].[Certificate]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Location]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Module]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PersInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Qualification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Requirement]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Role]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Session]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SessionGiver]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SessionMembers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SessionMembersQualification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ShootingType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Unit]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Weapon]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "DESKTOP-3C2FPNA.Targetry",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

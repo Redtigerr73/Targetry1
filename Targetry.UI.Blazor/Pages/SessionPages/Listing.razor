@@ -1,0 +1,166 @@
+﻿@page "/Sessions"
+@using Microsoft.AspNetCore.Components
+@using Targetry.UI.Blazor.Data.Dtos
+@using Targetry.UI.Data.Interfaces
+@inject IRefreshRequestService RefreshPage
+@inject IDialogService DialogService
+@inject IUserService userService
+@inject ISnackbar snackBar
+@attribute [Authorize]
+
+<MudItem lg="12" Class="pa-2 d-flex justify-space-between">
+    <MudItem>
+        <MudButton OnClick="@(e => OpenDialogForAddForm())" Class="pa-3" ButtonType="ButtonType.Button" Style="background-color:#F5F3FD;color:#2E00FF">
+            <MudIcon Icon="@Icons.Filled.Add" Color="Color.Primary" /> Create new View
+        </MudButton>
+    </MudItem>
+</MudItem>
+
+<MudTable Elevation="25" T="UserDto" @ref="listing" ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(UpdateTable))"  @bind-customer="userModel" Loading="@_tableloading">
+
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Users</MudText>
+        <MudSpacer/>
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search for Users..." Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>User Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Matricule</MudTh>
+        <MudTh>Role Id</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Matricule">@context.Matricule</MudTd>
+        <MudTd DataLabel="RoleId">@context.RoleId</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(() => Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private MudTable<UserDto> listing;
+    private string searchString = "";
+    private string searchString1 = "";
+    private UserDto userModel = new UserDto();
+    private List<UserDto> users = new List<UserDto>();
+    private bool _tableloading;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetAllUsers();
+        }
+    }
+
+    private async Task<List<UserDto>> GetAllUsers()
+    {
+        HideShowLoader(true);
+        users = await userService.GetAllUsers();
+        HideShowLoader(false);
+        return users;
+    }
+
+    private async Task<TableData<UserDto>> UpdateTable(TableState state)
+    {
+        users = await userService.GetAllUsers();
+        users = users.Where(element =>
+        {
+            if (string.IsNullOrEmpty(searchString) ||
+                element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                || element.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                || element.Matricule.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            
+            return false;
+        }).ToList();
+        return new TableData<UserDto>() { Items = users, TotalItems = users.Count };
+    }
+
+    private bool FilterFunc1(UserDto user) => FilterFunc(user, searchString);
+
+    private bool FilterFunc(UserDto user, string searchValue)
+    {
+        if (string.IsNullOrEmpty(searchValue) &&
+            user.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)
+            || user.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)
+            || user.Matricule.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private async Task Delete(int id)
+    {
+        await userService.DeleteUser(id);
+        await listing.ReloadServerData();
+        snackBar.Add("Customer Deleted.", Severity.Success);
+        StateHasChanged();
+    }
+
+    private void Edit(int contextId)
+    {
+        userModel = users.FirstOrDefault(c => c.Id == contextId);
+        if (userModel is not null)
+        {
+            DialogParameters dialogParameters = new DialogParameters();
+            dialogParameters.Add("UserModel", userModel);
+            DialogOptions options = new MudBlazor.DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, Position = DialogPosition.TopCenter };
+            DialogService.Show<AddEditSession>("Update", dialogParameters, options);
+            RefreshPage.RefreshRequested += RefreshReferences;
+        }
+        else
+        {
+            snackBar.Add("Customer not found.", Severity.Success);
+        }
+    }
+
+    private void OpenDialogForAddForm()
+    {
+        userModel = new UserDto();
+        DialogParameters dialogParameters = new DialogParameters();
+        dialogParameters.Add("UserModel", userModel);
+        DialogOptions options = new MudBlazor.DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, Position = DialogPosition.TopCenter };
+        DialogService.Show<AddEditSession>("Create", dialogParameters, options);
+        RefreshPage.RefreshRequested += RefreshReferences;
+    }
+
+
+    private void RefreshReferences()
+    {
+        InvokeAsync(() =>
+        {
+            GetAllUsers();
+            listing.ReloadServerData();
+            StateHasChanged();
+        });
+    }
+
+    private void HideShowLoader(bool show)
+    {
+        if (show)
+        {
+            _tableloading = true;
+        }
+        else
+        {
+            _tableloading = false;
+        }
+        StateHasChanged();
+    }
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        listing.ReloadServerData();
+    }
+}

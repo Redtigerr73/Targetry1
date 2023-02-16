@@ -1,0 +1,64 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <p>Determining session state, please wait...</p>
+                </Authorizing>
+                <NotAuthorized>
+                    <use>
+                        <MudCard>
+                            <MudCardContent>
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Error 403 : You're not Authorized on this page ! </MudAlert>
+                            </MudCardContent>
+                        </MudCard>
+                    </use>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+<style>
+    * {
+        margin:0;
+        padding: 0;
+    }
+    body{
+        background: whitesmoke;
+  
+    }
+    .whistle{
+        width: 20%;
+        fill: orangered;
+        margin: 100px 40%;
+        text-align: left;
+        transform: translate(-50%, -50%);
+        transform: rotate(0);
+        transform-origin: 80% 30%;
+        animation: wiggle .2s infinite;
+    }
+    h1{
+        margin-top: -100px;
+        margin-bottom: 20px;
+        color: #facf5a;
+        text-align: center;
+        font-family: 'Raleway';
+        font-size: 90px;
+        font-weight: 800;
+    }
+    h2{
+        color: orangered;
+        text-align: center;
+        font-family: 'Raleway';
+        font-size: 30px;
+        text-transform: uppercase;
+    }
+</style>
